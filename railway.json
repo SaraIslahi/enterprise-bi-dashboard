@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "gunicorn bi_webapp.wsgi:application --bind 0.0.0.0:$PORT"
+    "startCommand": "cd bi_webapp && gunicorn bi_webapp.wsgi:application --bind 0.0.0.0:$PORT"
   }
 }

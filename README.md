@@ -1,5 +1,9 @@
 # Enterprise BI Data Warehouse
 
+## Live Demo
+
+👉 **[View the Enterprise BI Dashboard](https://enterprise-bi-dashboard-production.up.railway.app)**
+
 ## What is the project?
 
 This project implements a **Business Intelligence (BI) data warehouse** designed to analyze a company’s sales performance over time.  

@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-ar-90s3f3+^4buo^d4ns%ije80s&k4(2k64#%+0^h+i=i72twt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "enterprise-bi-dashboard-production.up.railway.app",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition

@@ -125,3 +125,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://enterprise-bi-dashboard-production.up.railway.app",
+]

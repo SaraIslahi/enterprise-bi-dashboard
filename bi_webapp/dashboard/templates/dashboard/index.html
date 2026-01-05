@@ -1,0 +1,241 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard | Enterprise BI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(255, 255, 255, 0.06);
+        --border: rgba(255, 255, 255, 0.15);
+        --text: #eaf0ff;
+        --muted: rgba(234, 240, 255, 0.75);
+        --accent: #7c5cff;
+        --accent-2: #22c55e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: radial-gradient(
+            900px 400px at 15% 0%,
+            rgba(124, 92, 255, 0.25),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 400px at 85% 10%,
+            rgba(34, 197, 94, 0.2),
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(1100px, 92%);
+        margin: auto;
+        padding: 32px 0 60px;
+      }
+
+      /* Top bar */
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+
+      .brand {
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .nav a {
+        color: var(--muted);
+        text-decoration: none;
+        margin-left: 16px;
+        font-size: 14px;
+      }
+
+      .nav a:hover {
+        color: var(--text);
+      }
+
+      /* Messages */
+      .messages {
+        margin-bottom: 22px;
+      }
+
+      .message {
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .message.success {
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.4);
+        color: #bbf7d0;
+      }
+
+      .message.error {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        color: #fecaca;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 22px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+
+      /* KPI cards */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .kpi {
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .kpi h3 {
+        margin: 0 0 6px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .kpi .value {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      /* Charts */
+      .chart-card {
+        margin-top: 20px;
+      }
+
+      canvas {
+        width: 100% !important;
+        max-height: 420px;
+      }
+
+      @media (max-width: 900px) {
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- Top bar -->
+      <div class="topbar">
+        <div class="brand">📈 Enterprise BI Dashboard</div>
+        <div class="nav">
+          <a href="{% url 'home' %}">Home</a>
+          <a href="{% url 'upload' %}">Upload</a>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- KPI section -->
+      <div class="card">
+        <h1>Key Performance Indicators</h1>
+        <p class="subtitle">
+          Summary metrics calculated from the currently uploaded dataset.
+        </p>
+
+        <div class="kpi-grid">
+          <div class="kpi">
+            <h3>Total Revenue</h3>
+            <div class="value">{{ total_revenue }}</div>
+          </div>
+
+          <div class="kpi">
+            <h3>Total Orders</h3>
+            <div class="value">{{ orders }}</div>
+          </div>
+
+          <div class="kpi">
+            <h3>Average Order Value</h3>
+            <div class="value">{{ aov }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue by Country -->
+      <div class="card chart-card">
+        <h2>Revenue by Country</h2>
+        <p class="subtitle">Aggregated revenue grouped by country.</p>
+        <canvas id="revenueByCountry"></canvas>
+      </div>
+      <!-- Revenue Share -->
+      <div class="card chart-card">
+        <h2>Revenue Share by Country</h2>
+        <p class="subtitle">
+          Percentage contribution of each country to total revenue.
+        </p>
+        <canvas id="revenueShare"></canvas>
+      </div>
+
+      <!-- Revenue over Time -->
+      <div class="card chart-card">
+        <h2>Revenue Over Time</h2>
+        <p class="subtitle">Daily revenue trend based on order date.</p>
+        <canvas id="revenueDaily"></canvas>
+      </div>
+    </div>
+
+    <!-- JSON data injected from Django -->
+    <script id="byCountry-data" type="application/json">
+      {{ by_country_json|safe }}
+    </script>
+
+    <script id="daily-data" type="application/json">
+      {{ daily_json|safe }}
+    </script>
+
+    <!-- Charts logic -->
+    <script src="{% static 'charts.js' %}"></script>
+  </body>
+</html>

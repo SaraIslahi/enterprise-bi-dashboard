@@ -1,0 +1,227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Upload Dataset | Enterprise BI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(255, 255, 255, 0.06);
+        --border: rgba(255, 255, 255, 0.15);
+        --text: #eaf0ff;
+        --muted: rgba(234, 240, 255, 0.75);
+        --accent: #7c5cff;
+        --accent-2: #22c55e;
+        --error: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: radial-gradient(
+            900px 400px at 15% 0%,
+            rgba(124, 92, 255, 0.25),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 400px at 85% 10%,
+            rgba(34, 197, 94, 0.2),
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(800px, 92%);
+        margin: auto;
+        padding: 40px 0 60px;
+      }
+
+      /* Top bar */
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 36px;
+      }
+
+      .brand {
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .nav a {
+        color: var(--muted);
+        text-decoration: none;
+        margin-left: 16px;
+        font-size: 14px;
+      }
+
+      .nav a:hover {
+        color: var(--text);
+      }
+
+      /* Card */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 28px;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 24px;
+      }
+
+      /* Messages */
+      .messages {
+        margin-bottom: 18px;
+      }
+
+      .message {
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .message.error {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        color: #fecaca;
+      }
+
+      .message.success {
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.4);
+        color: #bbf7d0;
+      }
+
+      /* Form */
+      form {
+        margin-top: 10px;
+      }
+
+      input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        margin-bottom: 18px;
+      }
+
+      button {
+        display: inline-block;
+        padding: 12px 18px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        background: linear-gradient(135deg, #7c5cff, #9a84ff);
+        color: white;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      .hint {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .footer-links {
+        margin-top: 22px;
+        font-size: 14px;
+      }
+
+      .footer-links a {
+        color: var(--accent-2);
+        text-decoration: none;
+      }
+
+      .footer-links a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- Top bar -->
+      <div class="topbar">
+        <div class="brand">📤 Upload Dataset</div>
+        <div class="nav">
+          <a href="{% url 'home' %}">Home</a>
+          <a href="{% url 'index' %}">Dashboard</a>
+        </div>
+      </div>
+
+      <!-- Upload card -->
+      <div class="card">
+        <h1>Upload CSV Dataset</h1>
+        <p class="subtitle">
+          Upload a sales dataset in CSV format. The file will be validated and
+          loaded into the staging layer for analysis.
+        </p>
+
+        <!-- Django messages -->
+        {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <form
+          method="post"
+          enctype="multipart/form-data"
+          action="{% url 'upload' %}"
+        >
+          {% csrf_token %} {{ form.file }}
+          <button type="submit">Upload & Analyze</button>
+        </form>
+
+        <div class="hint">
+          <strong>Expected columns:</strong><br />
+          <code>order_id</code>, <code>order_date</code>,
+          <code>customer_name</code>, <code>country</code>,
+          <code>product_name</code>, <code>quantity</code>, <code>revenue</code
+          ><br /><br />
+          Extra columns are ignored. A column-mapping feature will be added in a
+          future version.
+        </div>
+
+        <div class="footer-links">
+          ← <a href="{% url 'index' %}">Go to Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

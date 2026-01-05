@@ -1,0 +1,13 @@
+order_id,order_date,customer_name,country,product_name,quantity,revenue
+2001,2024-02-01,Alice Dupont,France,Laptop Pro,1,1200
+2002,2024-02-01,John Smith,USA,Office Chair,2,300
+2003,2024-02-02,Maria Rossi,Italy,Laptop Pro,1,1200
+2004,2024-02-03,Ahmed Benali,Morocco,Desk Lamp,3,150
+2005,2024-02-03,Emily Clark,UK,Office Chair,1,150
+2006,2024-02-04,Alice Dupont,France,Desk Lamp,2,100
+2007,2024-02-05,John Smith,USA,Laptop Pro,1,1200
+2008,2024-02-06,Maria Rossi,Italy,Office Chair,2,300
+2009,2024-02-07,Ahmed Benali,Morocco,Laptop Pro,1,1200
+2010,2024-02-08,Emily Clark,UK,Desk Lamp,1,50
+2011,2024-02-09,Alice Dupont,France,Office Chair,1,150
+2012,2024-02-10,John Smith,USA,Desk Lamp,2,100

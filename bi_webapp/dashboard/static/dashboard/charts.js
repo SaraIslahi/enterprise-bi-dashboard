@@ -1,122 +1,95 @@
-function readJson(id) {
-  const el = document.getElementById(id);
-  if (!el) {
-    console.error(`Missing JSON script tag: ${id}`);
-    return [];
+(function () {
+  function readJsonScript(id) {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.error(`[charts] Missing JSON script tag: #${id}`);
+      return [];
+    }
+    try {
+      return JSON.parse(el.textContent || "[]");
+    } catch (e) {
+      console.error(`[charts] Failed to parse JSON in #${id}`, e);
+      return [];
+    }
   }
-  try {
-    return JSON.parse(el.textContent);
-  } catch (e) {
-    console.error("JSON parse error:", e);
-    console.log(el.textContent);
-    return [];
+
+  // Ensure Chart.js is loaded
+  if (typeof Chart === "undefined") {
+    console.error("[charts] Chart.js is not loaded (Chart is undefined).");
+    return;
   }
-}
 
-// static/charts.js
-console.log("charts.js loaded ✅");
+  const byCountry = readJsonScript("byCountry-data"); // [{country, revenue}, ...]
+  const daily = readJsonScript("daily-data"); // [{date, revenue}, ...]
 
-function readJson(id) {
-  const el = document.getElementById(id);
-  if (!el) {
-    console.error(`Missing script tag #${id}`);
-    return [];
-  }
-  const raw = (el.textContent || "").trim();
-  if (!raw) {
-    console.error(`Empty JSON in #${id}`);
-    return [];
-  }
-  try {
-    return JSON.parse(raw);
-  } catch (e) {
-    console.error(`JSON parse error in #${id}`, e);
-    console.log("Raw:", raw);
-    return [];
-  }
-}
+  // Helpers
+  const toNumber = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
 
-document.addEventListener("DOMContentLoaded", () => {
-  const byCountry = readJson("byCountry-data"); // [{country, revenue}, ...]
-  const dailyData = readJson("daily-data"); // [{day, revenue}, ...]
+  // ---- Chart 1: Revenue by Country (bar)
+  const c1 = document.getElementById("revenueByCountry");
+  if (c1) {
+    const labels = byCountry.map((r) => r.country || "Unknown");
+    const values = byCountry.map((r) => toNumber(r.revenue));
 
-  // ----- Revenue by Country -----
-  const countryCanvas = document.getElementById("revenueByCountry");
-  if (!countryCanvas) {
-    console.error("Canvas #revenueByCountry not found");
-  } else {
-    const countryLabels = byCountry.map((r) => r.country ?? r.region);
-    const countryValues = byCountry.map((r) => Number(r.revenue));
-
-    new Chart(countryCanvas, {
+    new Chart(c1, {
       type: "bar",
       data: {
-        labels: countryLabels,
-        datasets: [{ label: "Revenue", data: countryValues }],
+        labels,
+        datasets: [{ label: "Revenue", data: values }],
       },
       options: {
         responsive: true,
+        plugins: { legend: { display: false } },
       },
     });
+  } else {
+    console.error("[charts] Missing canvas #revenueByCountry");
   }
 
-  // ----- Revenue Over Time -----
-  const dailyCanvas = document.getElementById("revenueDaily");
-  if (!dailyCanvas) {
-    console.error("Canvas #revenueDaily not found");
+  // ---- Chart 2: Revenue share (pie)
+  const c2 = document.getElementById("revenueShare");
+  if (c2) {
+    const labels = byCountry.map((r) => r.country || "Unknown");
+    const values = byCountry.map((r) => toNumber(r.revenue));
+
+    new Chart(c2, {
+      type: "pie",
+      data: {
+        labels,
+        datasets: [{ label: "Revenue share", data: values }],
+      },
+      options: { responsive: true },
+    });
   } else {
-    const dayLabels = dailyData.map((d) => d.date ?? d.day);
+    console.error("[charts] Missing canvas #revenueShare");
+  }
 
-    const dayValues = dailyData.map((d) => Number(d.revenue));
+  // ---- Chart 3: Revenue over time (line)
+  const c3 = document.getElementById("revenueDaily");
+  if (c3) {
+    const labels = daily.map((r) => (r.date ? String(r.date) : ""));
+    const values = daily.map((r) => toNumber(r.revenue));
 
-    new Chart(dailyCanvas, {
+    new Chart(c3, {
       type: "line",
       data: {
-        labels: dayLabels,
-        datasets: [{ label: "Revenue", data: dayValues }],
+        labels,
+        datasets: [{ label: "Revenue", data: values, tension: 0.25 }],
       },
       options: {
         responsive: true,
-      },
-    });
-  }
-  // ----- Revenue Share (Pie Chart) -----
-  const shareCanvas = document.getElementById("revenueShare");
-  if (shareCanvas) {
-    const byCountry = readJson("byCountry-data");
-    console.log("By country data:", byCountry);
-    const labels = byCountry.map((r) => r.country);
-    const values = byCountry.map((r) => Number(r.revenue));
-
-    new Chart(shareCanvas, {
-      type: "doughnut", // use "pie" if you prefer
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            data: values,
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "right",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const value = context.raw;
-                const pct = ((value / total) * 100).toFixed(1);
-                return `${context.label}: ${value} (${pct}%)`;
-              },
-            },
-          },
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 0 } },
         },
       },
     });
+  } else {
+    console.error("[charts] Missing canvas #revenueDaily");
   }
-});
+
+  console.log("[charts] Charts rendered successfully ✅");
+})();

@@ -1,0 +1,1 @@
+SELECT * FROM kpi_revenue_daily;

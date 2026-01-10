@@ -6,6 +6,9 @@
     <title>Dashboard | Enterprise BI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- ✅ CSS (correct) -->
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   </head>
@@ -21,7 +24,6 @@
         </div>
       </div>
 
-      <!-- Messages -->
       {% if messages %}
       <div class="messages">
         {% for message in messages %}
@@ -30,12 +32,9 @@
       </div>
       {% endif %}
 
-      <!-- KPI section -->
       <div class="card">
         <h1>Key Performance Indicators</h1>
-        <p class="subtitle">
-          Summary metrics calculated from the currently uploaded dataset.
-        </p>
+        <p class="subtitle">Summary metrics calculated from the currently uploaded dataset.</p>
 
         <div class="kpi-grid">
           <div class="kpi">
@@ -55,22 +54,18 @@
         </div>
       </div>
 
-      <!-- Revenue by Country -->
       <div class="card chart-card">
         <h2>Revenue by Country</h2>
         <p class="subtitle">Aggregated revenue grouped by country.</p>
         <canvas id="revenueByCountry"></canvas>
       </div>
-      <!-- Revenue Share -->
+
       <div class="card chart-card">
         <h2>Revenue Share by Country</h2>
-        <p class="subtitle">
-          Percentage contribution of each country to total revenue.
-        </p>
+        <p class="subtitle">Percentage contribution of each country to total revenue.</p>
         <canvas id="revenueShare"></canvas>
       </div>
 
-      <!-- Revenue over Time -->
       <div class="card chart-card">
         <h2>Revenue Over Time</h2>
         <p class="subtitle">Daily revenue trend based on order date.</p>
@@ -78,7 +73,6 @@
       </div>
     </div>
 
-    <!-- JSON data injected from Django -->
     <script id="byCountry-data" type="application/json">
       {{ by_country_json|safe }}
     </script>
@@ -89,6 +83,5 @@
 
     <!-- Charts logic -->
     <script src="{% static 'dashboard/charts.js' %}"></script>
-    <link href="dashboard/style.css" />
   </body>
 </html>
